@@ -1,0 +1,246 @@
+@font-face {
+  font-family: "Geist Sans";
+  src: url("/fonts/Geist-Variable.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: "Geist Mono";
+  src: url("/fonts/GeistMono-Variable.woff2") format("woff2");
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+@custom-variant short (@media (max-height: 500px));
+@custom-variant medium-short (@media (max-height: 700px));
+
+@theme {
+  --font-sans: "Geist Sans", "Helvetica Neue", "Helvetica", "Arial", ui-sans-serif, system-ui, sans-serif;
+  --font-mono: "Geist Mono", ui-monospace, monospace;
+  --breakpoint-xs: 380px;
+}
+
+/* Mobile-only body text override: text-base renders 14px below md (768px),
+   stays 16px on desktop. Works because Tailwind v4 utilities reference
+   --text-base via var(), so reassigning the variable cascades. */
+@media (max-width: 767px) {
+  :root {
+    --text-base: 0.875rem;
+  }
+}
+
+@layer base {
+  /* Visible focus indicator for keyboard nav (not mouse clicks).
+     Brand-aware: outline = currentColor so it adapts to text color (black on light, white on dark).
+     Stronger than default browser ring without being intrusive. */
+  :focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 3px;
+    border-radius: 2px;
+    transition: outline-offset 120ms ease-out;
+  }
+  /* On mouse click, hide focus ring (kept for keyboard nav only) */
+  :focus:not(:focus-visible) {
+    outline: none;
+  }
+
+  /* Hide scrollbar but keep scrolling */
+  html {
+    scrollbar-width: none;          /* Firefox */
+  }
+  html::-webkit-scrollbar {
+    display: none;                  /* Chrome, Safari, Edge */
+  }
+
+  body {
+    @apply bg-white text-black antialiased overflow-x-hidden dark:bg-[#0a0a0a] dark:text-white;
+    font-family: var(--font-sans);
+    transition: background-color 0.3s ease, color 0.3s ease;
+    padding-top: calc(76px + env(safe-area-inset-top, 0px));
+    padding-left: env(safe-area-inset-left, 0px);
+    padding-right: env(safe-area-inset-right, 0px);
+  }
+
+  @media (min-width: 1024px) {
+    body {
+      padding-top: env(safe-area-inset-top, 0px);
+    }
+  }
+
+  body::after {
+    content: "";
+    position: fixed;
+    inset: -50%;
+    z-index: 9999;
+    pointer-events: none;
+    /* Light mode needs slightly more grain to read against bright surfaces;
+       dark mode less, otherwise it overpowers the deep background. */
+    opacity: 0.12;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='200' height='200'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='200' height='200' filter='url(%23g)'/%3E%3C/svg%3E");
+    background-repeat: repeat;
+    animation: grain-drift 4s steps(6) infinite;
+    will-change: transform;
+  }
+  .dark body::after {
+    opacity: 0.08;
+  }
+
+  @keyframes grain-drift {
+    0%   { transform: translate(0,    0); }
+    10%  { transform: translate(-5%, -10%); }
+    20%  { transform: translate(-15%,  5%); }
+    30%  { transform: translate(7%,  -25%); }
+    40%  { transform: translate(-5%, 25%); }
+    50%  { transform: translate(-15%, 10%); }
+    60%  { transform: translate(15%,   0); }
+    70%  { transform: translate(0,    15%); }
+    80%  { transform: translate(3%,   25%); }
+    90%  { transform: translate(-10%, 10%); }
+    100% { transform: translate(0,    0); }
+  }
+
+  @media (prefers-reduced-motion: reduce) {
+    body::after { animation: none; }
+  }
+
+  h1 {
+    @apply font-normal uppercase tracking-tighter leading-[0.9];
+    font-size: clamp(2.5rem, 10vw, 7.2rem);
+    text-wrap: balance;
+  }
+
+  h2 {
+    @apply font-normal uppercase tracking-tight leading-none;
+    font-size: clamp(1.5rem, 6vw, 4rem);
+    text-wrap: balance;
+  }
+
+  h3 {
+    @apply font-bold text-lg md:text-xl tracking-tight;
+    text-wrap: balance;
+  }
+
+  p {
+    @apply font-normal text-base;
+    line-height: 1.5;
+    text-wrap: pretty;
+  }
+
+  /* Long titles on very small viewports — let browsers break inside words to
+     avoid horizontal overflow rather than leaving big empty lines. */
+  @media (max-width: 380px) {
+    h1, h2, h3 {
+      overflow-wrap: anywhere;
+      hyphens: auto;
+    }
+  }
+}
+
+@layer utilities {
+  .text-micro {
+    @apply font-bold uppercase tracking-[0.1em];
+    font-size: clamp(0.6875rem, 1.5vw, 0.75rem);
+  }
+
+  /* Diagram h3 labels — sits between text-micro and text-base.
+     Used by the System Diagram circles (Define / Build / Scale). */
+  .text-diagram {
+    font-size: 15px;
+  }
+  @media (min-width: 1024px) {
+    .text-diagram {
+      font-size: 16.5px;
+    }
+  }
+
+  /* Compact mono labels for tile metadata / card overlays. 10 → 11px. */
+  .text-nano {
+    font-size: 10px;
+  }
+  @media (min-width: 640px) {
+    .text-nano {
+      font-size: 11px;
+    }
+  }
+
+  .text-huge {
+    @apply font-normal uppercase tracking-tight leading-none;
+    font-size: clamp(2.25rem, 9vw, 6rem);
+    text-wrap: balance;
+  }
+
+  .small-caps {
+    font-variant: small-caps;
+  }
+
+  .border-thin {
+    border-width: 0.5px;
+  }
+
+  .touch-target {
+    min-height: 44px;
+    min-width: 44px;
+  }
+}
+
+@keyframes ticker {
+  0% { transform: translateX(0); }
+  100% { transform: translateX(-50%); }
+}
+
+@keyframes gentle-swing {
+  0%, 100% { transform: rotateZ(-2deg); }
+  50% { transform: rotateZ(2deg); }
+}
+
+.animate-gentle-swing {
+  animation: gentle-swing 4s ease-in-out infinite;
+  transform-origin: top center;
+}
+
+.animate-ticker {
+  animation: ticker 20s linear infinite;
+}
+
+@keyframes page-load-bar {
+  0%   { transform: translateX(-100%); }
+  100% { transform: translateX(400%); }
+}
+.animate-page-load-bar {
+  animation: page-load-bar 0.9s ease-in-out infinite;
+}
+
+/* Hero headline final period — blinks as a cursor-style dot after the
+   line-by-line reveal completes (~1s in). step-end gives a hard on/off. */
+@keyframes blink-dot {
+  0%, 50%       { opacity: 1; }
+  50.01%, 100%  { opacity: 0; }
+}
+.animate-blink-dot {
+  animation: blink-dot 1.2s step-end 1s infinite;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+  .animate-ticker {
+    animation: none !important;
+  }
+  .animate-gentle-swing {
+    animation: none !important;
+  }
+  .animate-blink-dot {
+    animation: none !important;
+    opacity: 1 !important;
+  }
+}

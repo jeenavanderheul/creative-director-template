@@ -1,0 +1,23 @@
+# SPA routing — serve index.html for client-side routes
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteBase /
+  RewriteRule ^index\.html$ - [L]
+  RewriteCond %{REQUEST_FILENAME} !-f
+  RewriteCond %{REQUEST_FILENAME} !-d
+  RewriteRule . /index.html [L]
+</IfModule>
+
+# Fallback for hosts where mod_rewrite is unavailable:
+# any 404 serves index.html so React Router can resolve the path.
+ErrorDocument 404 /index.html
+
+# Cache busting / asset caching
+<IfModule mod_headers.c>
+  <FilesMatch "\.(js|css|woff2|webp|mp4|glb)$">
+    Header set Cache-Control "public, max-age=31536000, immutable"
+  </FilesMatch>
+  <FilesMatch "^(index\.html|sitemap\.xml|robots\.txt)$">
+    Header set Cache-Control "public, max-age=0, must-revalidate"
+  </FilesMatch>
+</IfModule>

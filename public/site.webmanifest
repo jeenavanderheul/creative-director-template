@@ -1,0 +1,16 @@
+{
+  "name": "Creative Director Template",
+  "short_name": "CD Template",
+  "description": "An editorial creative director portfolio template — clone, replace media, rewrite copy, ship.",
+  "icons": [
+    {
+      "src": "/favicon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml"
+    }
+  ],
+  "theme_color": "#0a0a0a",
+  "background_color": "#0a0a0a",
+  "display": "standalone",
+  "start_url": "/"
+}
